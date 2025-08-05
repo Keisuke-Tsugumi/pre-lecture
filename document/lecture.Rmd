@@ -1,6 +1,6 @@
 ---
-title: "事前課題解答例"
-author: ''
+title: "事前レクチャー　資料"
+author: '津組圭佑'
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -14,8 +14,8 @@ output:
 
 knitr::opts_chunk$set(echo = TRUE,message = FALSE, warning = FALSE)
 
-library(tidyverse) 
-# pacman::p_load(tidyverse)
+# library(tidyverse) 
+pacman::p_load(tidyverse, showtext, gt, gtsummary)
 
 ```
 
@@ -27,46 +27,437 @@ showtext_auto()
 
 ```
 
-$$y_i = \beta_0 + \beta_1 x_i + u_i$$
+# クリーニング
+## 頻出関数の紹介
 
 ```{r}
 
+# データフレームの作成
+
 set.seed(731)
 
-beta0 <- 5
-beta1 <- 2
-error <- rnorm(100, 0, 1)
-
-df <- 
+df1 <- 
   tibble(
-    id = 1:100,
-    x = runif(100, 0, 10),
-    y = beta0 + beta1 * x + error
+    id = 1:5,
+    year = 2024,
+    var1 = sample(0:10, 5)
+  ) 
+
+df2 <- 
+  tibble(
+    id = 1:5,
+    year = 2025,
+    var1 = sample(0:10, 5)
+  ) |> 
+  mutate(var1 = if_else(id == 3, NA, var1))
+
+df3 <- 
+  tibble(
+    id = rep(1:5, 2),
+    year = c(rep(2024, 5), rep(2025, 5)),
+    var2 = sample(0:10, 10)
+  ) |> 
+  arrange(id, year)
+
+```
+
+- 型の変更
+```{r}
+
+df1 |> 
+  mutate(var1 = as.character(var1)) |> 
+  view()
+
+```
+
+- 行・列の操作
+```{r}
+
+# as.charater
+df1 |> 
+  dplyr::filter(var1 >= 5)
+
+# select
+df1 |> 
+  select(id, var1)
+
+df1 |> 
+  select(!year)
+
+```
+
+```{r}
+
+# arrange
+df1 |> 
+  arrange(var1)
+
+# rename
+df1 |> 
+  rename(data_id = id)
+
+```
+
+```{r}
+
+# mutate
+df1 |> 
+  mutate(
+    var2 = var1 * 2,
+    var3 = year + var1
+  )
+
+df1 |> 
+  mutate(
+    status = if_else(var1 >= 5, "合格", "不合格"),
+    grade = case_when(var1 <= 4 ~ "F",
+                      var1 >= 5 & var1 <= 8 ~ "B",
+                      var1 >= 9 ~ "A")
+  ) 
+
+
+```
+
+- データの接続
+
+```{r}
+
+df4 <- 
+  df1 |> 
+  bind_rows(df2) |> 
+  arrange(id, year) |> 
+  mutate(
+    status = if_else(var1 >= 5, "合格", "不合格"),
+    grade = case_when(var1 <= 4 ~ "F",
+                      var1 >= 5 & var1 <= 8 ~ "B",
+                      var1 >= 9 ~ "A")
+  ) 
+
+```
+
+```{r}
+
+df4 <- 
+  df4 |> 
+  left_join(df3, by = c("id", "year"))
+
+```
+
+- 文字列の操作
+
+```{r}
+
+df4 |> 
+  mutate(status2 = paste0(status, "です"), .after = status)
+
+df4 |> 
+  mutate(status3 = str_remove(status, "格"),  .after = status) |>  
+  mutate(status4 = str_replace(status3, "不合", "否"), 
+         .after = status3)
+
+```
+
+- 集計
+```{r}
+
+df4 |> 
+  group_by(year) |> 
+  summarise(var1 = mean(var1, na.rm = T)) |> 
+  ungroup()
+
+```
+
+```{r}
+
+df4 |>  
+  summarise(var1 = mean(var1, na.rm = T), .by = year)
+
+```
+
+```{r}
+
+df4 |>
+  summarise(var1 = mean(var1), .by = id) 
+
+```
+
+- 欠損値の扱い
+
+```{r}
+
+df4 |> 
+  drop_na(var1)
+
+df4 |> 
+  group_by(id) |> 
+  fill(var1, .direction = "down") |> 
+  ungroup()
+
+df4 |> 
+  group_by(id) |> 
+  fill(var1, status, grade, .direction = "down") |> 
+  ungroup()
+
+```
+
+# 可視化
+## 表の出力
+
+```{r}
+
+df4 |> 
+  summarise(
+    mean = mean(var1),
+    var = var(var1),
+    .by = id
+  ) |> 
+  gt()
+
+```
+
+```{r}
+
+df4 |> 
+  gt(
+    rowname_col = "id",
+    groupname_col = "status"
   )
 
 ```
 
 ```{r}
 
-df |> 
-  ggplot(aes(x = x, y = y)) +
+df4 |> 
+  gt(
+    rowname_col = "id",
+    groupname_col = "status"
+  ) |> 
+  tab_footnote(
+    footnote = "このデータはフィクションです"
+  ) |> 
+  tab_footnote(
+    footnote = "ほかにも様々ながあります"
+  ) 
+
+```
+
+```{r}
+
+table <- 
+  df4 |> 
+  gt(
+    rowname_col = "id",
+    groupname_col = "status"
+  ) |> 
+  tab_footnote(
+    footnote = "このデータはフィクションです"
+  ) |> 
+  tab_footnote(
+    footnote = "ほかにも様々ながあります"
+  ) 
+
+gtsave(table, here::here("output", "table.tex"))
+
+```
+
+
+## 記述統計表の作成
+
+```{r}
+
+df4 |> 
+  tbl_summary()
+
+```
+
+```{r}
+
+df4 |>
+  tbl_summary(
+    include = c("var1", "var2"),
+    by = status,
+    type = list(var1 = "continuous",
+                var2 = "continuous"),
+    statistic = list(all_continuous() ~ "{mean}({sd})")
+  )
+
+```
+
+## ggplot2による作図
+
+### 1変数のグラフ
+
+```{r}
+
+df4 |> 
+  ggplot(aes(x = var1)) +
+  geom_histogram()
+
+df4 |> 
+  ggplot(aes(x = var1)) +
+  geom_density()
+
+```
+
+### 2変数のグラフ
+
+```{r}
+
+df4 |> 
+  ggplot(aes(x = var1, y = var2)) +
   geom_point() +
   geom_smooth(method = "lm")
 
 ```
 
+```{r}
 
+df4 |> 
+  summarise(var1 = mean(var1, na.rm = T), .by = year) |> 
+  ggplot(aes(x = year, y = var1)) +
+  geom_line()
 
+```
 
+```{r}
 
+df4 |> 
+  summarise(var1 = mean(var1, na.rm = T), .by = id) |> 
+  ggplot(aes(x = id, y = var1)) +
+  geom_bar(stat = "identity")
 
+```
 
+## 様々なオプション
 
+```{r}
 
+df4 <- 
+  df4 |> 
+  drop_na(var1)
 
+# グループ分け
+df4 |> 
+  ggplot(aes(x = var1, y = var2, color = status)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F)
 
+# 軸の設定
+df4 |> 
+  ggplot(aes(x = var1, y = var2, color = status)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F) +
+  scale_x_continuous(breaks = seq(0, 10, 5)) +
+  scale_y_continuous(breaks = seq(0, 10, 5)) 
 
+```
 
+```{r}
 
+# グラフの範囲指定
+df4 |> 
+  ggplot(aes(x = var1, y = var2, color = status)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F) +
+  scale_x_continuous(breaks = seq(0, 10, 5)) +
+  scale_y_continuous(breaks = seq(0, 10, 5)) +
+  coord_cartesian(xlim = c(0, 10), ylim = c(0, 10))
+
+```
+
+```{r}
+
+# ラベル
+df4 |> 
+  ggplot(aes(x = var1, y = var2, color = status)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F) +
+  scale_x_continuous(breaks = seq(0, 10, 5)) +
+  scale_y_continuous(breaks = seq(0, 10, 5)) +
+  coord_cartesian(xlim = c(0, 10), ylim = c(0, 10)) +
+  labs(x = "X軸の変数名", y = "Y軸の変数名",
+       title = "散布図")
+
+```
+
+```{r}
+
+# テーマ変更
+df4 |> 
+  ggplot(aes(x = var1, y = var2, color = status)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F) +
+  scale_x_continuous(breaks = seq(0, 10, 5)) +
+  scale_y_continuous(breaks = seq(0, 10, 5)) +
+  coord_cartesian(xlim = c(0, 10), ylim = c(0, 10)) +
+  labs(x = "X軸の変数名", y = "Y軸の変数名",
+       title = "散布図") +
+  theme_classic()
+
+```
+
+```{r}
+
+# 微調整
+df4 |> 
+  ggplot(aes(x = var1, y = var2, color = status)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F) +
+  scale_x_continuous(breaks = seq(0, 10, 5)) +
+  scale_y_continuous(breaks = seq(0, 10, 5)) +
+  annotate("text", x = 5, y = 5, label = "text", size = 15) +
+  coord_cartesian(xlim = c(0, 10), ylim = c(0, 10)) +
+  labs(x = "X軸の変数名", y = "Y軸の変数名",
+       title = "散布図") +
+  theme_classic() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    axis.title.x = element_text(size = 20, color = "red"),
+    axis.text.x = element_text(size = 20)
+    )
+
+```
+
+```{r}
+
+# グラフを並べる
+fig1 <- 
+  df4 |> 
+  ggplot(aes(x = var1, y = var2)) +
+  geom_point() 
+
+fig2 <- 
+  df4 |> 
+  ggplot(aes(x = var1, y = var2, color = status)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F) +
+  scale_x_continuous(breaks = seq(0, 10, 5)) +
+  scale_y_continuous(breaks = seq(0, 10, 5)) +
+  annotate("text", x = 5, y = 5, label = "text", size = 15) +
+  coord_cartesian(xlim = c(0, 10), ylim = c(0, 10)) +
+  labs(x = "X軸の変数名", y = "Y軸の変数名",
+       title = "散布図") +
+  theme_classic() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    axis.title.x = element_text(size = 20, color = "red"),
+    axis.text.x = element_text(size = 20)
+  )
+
+patchwork::wrap_plots(fig1, fig2, ncol = 2)
+
+```
+
+```{r}
+
+# グラフの保存
+
+fig3 <- 
+  patchwork::wrap_plots(fig1, fig2, ncol = 2)
+
+ggsave(here::here("output", "figure.pdf"), fig3,
+       height = 6, width = 10)
+
+```
 
 
