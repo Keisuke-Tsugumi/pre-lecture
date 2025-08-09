@@ -64,6 +64,7 @@ df3 <-
 - 型の変更
 ```{r}
 
+# as.character
 df1 |> 
   mutate(var1 = as.character(var1)) |> 
   view()
@@ -73,7 +74,7 @@ df1 |>
 - 行・列の操作
 ```{r}
 
-# as.charater
+# filter
 df1 |> 
   dplyr::filter(var1 >= 5)
 
@@ -122,6 +123,7 @@ df1 |>
 
 ```{r}
 
+# bind_rows
 df4 <- 
   df1 |> 
   bind_rows(df2) |> 
@@ -133,13 +135,18 @@ df4 <-
                       var1 >= 9 ~ "A")
   ) 
 
+df4
+
 ```
 
 ```{r}
 
+# left_join
 df4 <- 
   df4 |> 
   left_join(df3, by = c("id", "year"))
+
+df4
 
 ```
 
@@ -147,9 +154,11 @@ df4 <-
 
 ```{r}
 
+# paste0
 df4 |> 
   mutate(status2 = paste0(status, "です"), .after = status)
 
+# str_**
 df4 |> 
   mutate(status3 = str_remove(status, "格"),  .after = status) |>  
   mutate(status4 = str_replace(status3, "不合", "否"), 
@@ -160,6 +169,7 @@ df4 |>
 - 集計
 ```{r}
 
+# group_by, summarise
 df4 |> 
   group_by(year) |> 
   summarise(var1 = mean(var1, na.rm = T)) |> 
@@ -185,9 +195,15 @@ df4 |>
 
 ```{r}
 
+# is.na
+df4 |> 
+  filter(is.na(var1))
+
+# drop_na
 df4 |> 
   drop_na(var1)
 
+# fill
 df4 |> 
   group_by(id) |> 
   fill(var1, .direction = "down") |> 
@@ -205,6 +221,7 @@ df4 |>
 
 ```{r}
 
+# gt
 df4 |> 
   summarise(
     mean = mean(var1),
@@ -265,6 +282,7 @@ gtsave(table, here::here("output", "table.tex"))
 
 ```{r}
 
+# tbl_summary
 df4 |> 
   tbl_summary()
 

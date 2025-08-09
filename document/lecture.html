@@ -11,7 +11,7 @@
 
 <meta name="author" content="津組圭佑" />
 
-<meta name="date" content="2025-08-06" />
+<meta name="date" content="2025-08-10" />
 
 <title>事前レクチャー　資料</title>
 
@@ -440,7 +440,7 @@ display: none;
 
 <h1 class="title toc-ignore">事前レクチャー　資料</h1>
 <h4 class="author">津組圭佑</h4>
-<h4 class="date">2025-08-06</h4>
+<h4 class="date">2025-08-10</h4>
 
 </div>
 
@@ -481,13 +481,14 @@ df3 &lt;-
 <ul>
 <li>型の変更</li>
 </ul>
-<pre class="r"><code>df1 |&gt; 
+<pre class="r"><code># as.character
+df1 |&gt; 
   mutate(var1 = as.character(var1)) |&gt; 
   view()</code></pre>
 <ul>
 <li>行・列の操作</li>
 </ul>
-<pre class="r"><code># as.charater
+<pre class="r"><code># filter
 df1 |&gt; 
   dplyr::filter(var1 &gt;= 5)</code></pre>
 <pre><code>## # A tibble: 3 × 3
@@ -571,7 +572,8 @@ df1 |&gt;
 <ul>
 <li>データの接続</li>
 </ul>
-<pre class="r"><code>df4 &lt;- 
+<pre class="r"><code># bind_rows
+df4 &lt;- 
   df1 |&gt; 
   bind_rows(df2) |&gt; 
   arrange(id, year) |&gt; 
@@ -580,14 +582,46 @@ df1 |&gt;
     grade = case_when(var1 &lt;= 4 ~ &quot;F&quot;,
                       var1 &gt;= 5 &amp; var1 &lt;= 8 ~ &quot;B&quot;,
                       var1 &gt;= 9 ~ &quot;A&quot;)
-  ) </code></pre>
-<pre class="r"><code>df4 &lt;- 
+  ) 
+
+df4</code></pre>
+<pre><code>## # A tibble: 10 × 5
+##       id  year  var1 status grade
+##    &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;chr&gt;  &lt;chr&gt;
+##  1     1  2024     7 合格   B    
+##  2     1  2025     0 不合格 F    
+##  3     2  2024     9 合格   A    
+##  4     2  2025     8 合格   B    
+##  5     3  2024     1 不合格 F    
+##  6     3  2025    NA &lt;NA&gt;   &lt;NA&gt; 
+##  7     4  2024     4 不合格 F    
+##  8     4  2025     3 不合格 F    
+##  9     5  2024     5 合格   B    
+## 10     5  2025     1 不合格 F</code></pre>
+<pre class="r"><code># left_join
+df4 &lt;- 
   df4 |&gt; 
-  left_join(df3, by = c(&quot;id&quot;, &quot;year&quot;))</code></pre>
+  left_join(df3, by = c(&quot;id&quot;, &quot;year&quot;))
+
+df4</code></pre>
+<pre><code>## # A tibble: 10 × 6
+##       id  year  var1 status grade  var2
+##    &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;int&gt;
+##  1     1  2024     7 合格   B         1
+##  2     1  2025     0 不合格 F         7
+##  3     2  2024     9 合格   A         9
+##  4     2  2025     8 合格   B         3
+##  5     3  2024     1 不合格 F         2
+##  6     3  2025    NA &lt;NA&gt;   &lt;NA&gt;      4
+##  7     4  2024     4 不合格 F         6
+##  8     4  2025     3 不合格 F         8
+##  9     5  2024     5 合格   B         0
+## 10     5  2025     1 不合格 F        10</code></pre>
 <ul>
 <li>文字列の操作</li>
 </ul>
-<pre class="r"><code>df4 |&gt; 
+<pre class="r"><code># paste0
+df4 |&gt; 
   mutate(status2 = paste0(status, &quot;です&quot;), .after = status)</code></pre>
 <pre><code>## # A tibble: 10 × 7
 ##       id  year  var1 status status2    grade  var2
@@ -602,7 +636,8 @@ df1 |&gt;
 ##  8     4  2025     3 不合格 不合格です F         8
 ##  9     5  2024     5 合格   合格です   B         0
 ## 10     5  2025     1 不合格 不合格です F        10</code></pre>
-<pre class="r"><code>df4 |&gt; 
+<pre class="r"><code># str_**
+df4 |&gt; 
   mutate(status3 = str_remove(status, &quot;格&quot;),  .after = status) |&gt;  
   mutate(status4 = str_replace(status3, &quot;不合&quot;, &quot;否&quot;), 
          .after = status3)</code></pre>
@@ -622,7 +657,8 @@ df1 |&gt;
 <ul>
 <li>集計</li>
 </ul>
-<pre class="r"><code>df4 |&gt; 
+<pre class="r"><code># group_by, summarise
+df4 |&gt; 
   group_by(year) |&gt; 
   summarise(var1 = mean(var1, na.rm = T)) |&gt; 
   ungroup()</code></pre>
@@ -651,7 +687,15 @@ df1 |&gt;
 <ul>
 <li>欠損値の扱い</li>
 </ul>
-<pre class="r"><code>df4 |&gt; 
+<pre class="r"><code># is.na
+df4 |&gt; 
+  filter(is.na(var1))</code></pre>
+<pre><code>## # A tibble: 1 × 6
+##      id  year  var1 status grade  var2
+##   &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;int&gt;
+## 1     3  2025    NA &lt;NA&gt;   &lt;NA&gt;      4</code></pre>
+<pre class="r"><code># drop_na
+df4 |&gt; 
   drop_na(var1)</code></pre>
 <pre><code>## # A tibble: 9 × 6
 ##      id  year  var1 status grade  var2
@@ -665,7 +709,8 @@ df1 |&gt;
 ## 7     4  2025     3 不合格 F         8
 ## 8     5  2024     5 合格   B         0
 ## 9     5  2025     1 不合格 F        10</code></pre>
-<pre class="r"><code>df4 |&gt; 
+<pre class="r"><code># fill
+df4 |&gt; 
   group_by(id) |&gt; 
   fill(var1, .direction = &quot;down&quot;) |&gt; 
   ungroup()</code></pre>
@@ -705,7 +750,8 @@ df1 |&gt;
 <h1><span class="header-section-number">2</span> 可視化</h1>
 <div id="表の出力" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> 表の出力</h2>
-<pre class="r"><code>df4 |&gt; 
+<pre class="r"><code># gt
+df4 |&gt; 
   summarise(
     mean = mean(var1),
     var = var(var1),
@@ -2119,7 +2165,8 @@ gtsave(table, here::here(&quot;output&quot;, &quot;table.tex&quot;))</code></pre
 </div>
 <div id="記述統計表の作成" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> 記述統計表の作成</h2>
-<pre class="r"><code>df4 |&gt; 
+<pre class="r"><code># tbl_summary
+df4 |&gt; 
   tbl_summary()</code></pre>
 <div id="lkxbmgvwdn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>#lkxbmgvwdn table {
