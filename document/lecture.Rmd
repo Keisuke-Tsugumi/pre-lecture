@@ -93,6 +93,9 @@ df1 |>
 df1 |> 
   arrange(var1)
 
+df1 |> 
+  arrange(desc(var1))
+
 # rename
 df1 |> 
   rename(data_id = id)
@@ -198,6 +201,9 @@ df4 |>
 # is.na
 df4 |> 
   filter(is.na(var1))
+
+df4 |> 
+  filter(var1 == NA)
 
 # drop_na
 df4 |> 
