@@ -11,7 +11,7 @@
 
 <meta name="author" content="津組圭佑" />
 
-<meta name="date" content="2025-08-11" />
+<meta name="date" content="2025-08-12" />
 
 <title>事前レクチャー　資料</title>
 
@@ -440,7 +440,7 @@ display: none;
 
 <h1 class="title toc-ignore">事前レクチャー　資料</h1>
 <h4 class="author">津組圭佑</h4>
-<h4 class="date">2025-08-11</h4>
+<h4 class="date">2025-08-12</h4>
 
 </div>
 
@@ -554,16 +554,17 @@ df1 |&gt;
 df1 |&gt; 
   mutate(
     var2 = var1 * 2,
-    var3 = year + var1
+    var3 = year + var1,
+    var4 = var3 * 2
   )</code></pre>
-<pre><code>## # A tibble: 5 × 5
-##      id  year  var1  var2  var3
-##   &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1     1  2024     7    14  2031
-## 2     2  2024     9    18  2033
-## 3     3  2024     1     2  2025
-## 4     4  2024     4     8  2028
-## 5     5  2024     5    10  2029</code></pre>
+<pre><code>## # A tibble: 5 × 6
+##      id  year  var1  var2  var3  var4
+##   &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     1  2024     7    14  2031  4062
+## 2     2  2024     9    18  2033  4066
+## 3     3  2024     1     2  2025  4050
+## 4     4  2024     4     8  2028  4056
+## 5     5  2024     5    10  2029  4058</code></pre>
 <pre class="r"><code>df1 |&gt; 
   mutate(
     status = if_else(var1 &gt;= 5, &quot;合格&quot;, &quot;不合格&quot;),
@@ -3149,7 +3150,8 @@ height: 0px !important;
     type = list(var1 = &quot;continuous&quot;,
                 var2 = &quot;continuous&quot;),
     statistic = list(all_continuous() ~ &quot;{mean}({sd})&quot;)
-  )</code></pre>
+  ) |&gt; 
+  add_overall()</code></pre>
 <div id="tjjhdtxbqg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>#tjjhdtxbqg table {
 font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -3553,6 +3555,9 @@ height: 0px !important;
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;span class=&#39;gt_from_md&#39;&gt;&lt;strong&gt;合格&lt;/strong&gt;&lt;br /&gt;
 N = 4&lt;/span&gt;&lt;span class=&quot;gt_footnote_marks&quot; style=&quot;white-space:nowrap;font-style:italic;font-weight:normal;line-height: 0;&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/span&gt;"><span class="gt_from_md"><strong>合格</strong><br />
 N = 4</span><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height: 0;"><sup>1</sup></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;span class=&#39;gt_from_md&#39;&gt;&lt;strong&gt;Overall&lt;/strong&gt;&lt;br /&gt;
+N = 9&lt;/span&gt;&lt;span class=&quot;gt_footnote_marks&quot; style=&quot;white-space:nowrap;font-style:italic;font-weight:normal;line-height: 0;&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/span&gt;"><span class="gt_from_md"><strong>Overall</strong><br />
+N = 9</span><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height: 0;"><sup>1</sup></span></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;span class=&#39;gt_from_md&#39;&gt;&lt;strong&gt;不合格&lt;/strong&gt;&lt;br /&gt;
 N = 5&lt;/span&gt;&lt;span class=&quot;gt_footnote_marks&quot; style=&quot;white-space:nowrap;font-style:italic;font-weight:normal;line-height: 0;&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/span&gt;"><span class="gt_from_md"><strong>不合格</strong><br />
 N = 5</span><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height: 0;"><sup>1</sup></span></th>
@@ -3561,15 +3566,17 @@ N = 5</span><span class="gt_footnote_marks" style="white-space:nowrap;font-style
   <tbody class="gt_table_body">
     <tr><td headers="label" class="gt_row gt_left">var1</td>
 <td headers="stat_2" class="gt_row gt_center">7(2)</td>
+<td headers="stat_0" class="gt_row gt_center">4(3)</td>
 <td headers="stat_1" class="gt_row gt_center">2(2)</td></tr>
     <tr><td headers="label" class="gt_row gt_left">var2</td>
 <td headers="stat_2" class="gt_row gt_center">3(4)</td>
+<td headers="stat_0" class="gt_row gt_center">5(4)</td>
 <td headers="stat_1" class="gt_row gt_center">7(3)</td></tr>
   </tbody>
   
   <tfoot class="gt_footnotes">
     <tr>
-      <td class="gt_footnote" colspan="3"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height: 0;"><sup>1</sup></span> <span class="gt_from_md">Mean(SD)</span></td>
+      <td class="gt_footnote" colspan="4"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height: 0;"><sup>1</sup></span> <span class="gt_from_md">Mean(SD)</span></td>
     </tr>
   </tfoot>
 </table>

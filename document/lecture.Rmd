@@ -108,7 +108,8 @@ df1 |>
 df1 |> 
   mutate(
     var2 = var1 * 2,
-    var3 = year + var1
+    var3 = year + var1,
+    var4 = var3 * 2
   )
 
 df1 |> 
@@ -312,7 +313,8 @@ df4 |>
     type = list(var1 = "continuous",
                 var2 = "continuous"),
     statistic = list(all_continuous() ~ "{mean}({sd})")
-  )
+  ) |> 
+  add_overall()
 
 ```
 
